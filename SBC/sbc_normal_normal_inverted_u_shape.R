@@ -128,7 +128,7 @@ plot_sbc_diagnostics <- function(ranks, L_SAMPLES) {
   p_ecdf <- ggplot(ecdf_df, aes(x = rank_norm, y = ecdf_val)) +
     geom_ribbon(data = band_data, aes(x = rank_norm, ymin = y_lower, ymax = y_upper), 
                 fill = "skyblue", alpha = 0.2, inherit.aes = FALSE) + # Elliptical Confidence Band
-    geom_hline(yintercept = 0, linetype = "dashed", color = "black", linewidth = 0.8) +
+    geom_abline(intercept = 0, slope = 1, linetype = "dashed", color = "black", linewidth = 0.8) +
     geom_step(color = "blue", linewidth = 0.8) +
     labs(
       title = "b) ECDF",

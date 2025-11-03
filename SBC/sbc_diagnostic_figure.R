@@ -3,11 +3,8 @@ library(ggplot2)
 library(patchwork)
 library(dplyr)
 
-#set.seed(123)
 
-# --------------------------------------------------------------------------- #
-# 1. Define 4 conceptual scenarios (matching Mendes et al. Fig. 6)
-# --------------------------------------------------------------------------- #
+# --- Define 4 conceptual scenarios (matching Mendes et al. Fig. 6) ---
 scenarios <- list(
   list(name = "(a) Correct",        prior_mean = 0, prior_sd = 1,
        post_mean = 0, post_sd = 1,   rank_pattern = "uniform"),
@@ -19,9 +16,7 @@ scenarios <- list(
        post_mean = 2, post_sd = 1,   rank_pattern = "bias")
 )
 
-# --------------------------------------------------------------------------- #
-# 2. Simulate rank patterns (approximate shapes of SBC results)
-# --------------------------------------------------------------------------- #
+# --- Simulate rank patterns (approximate shapes of SBC results) ---
 simulate_ranks <- function(n = 1000, pattern = c("uniform", "under", "over", "bias")) {
   pattern <- match.arg(pattern)
   if (pattern == "uniform") {
@@ -38,9 +33,7 @@ simulate_ranks <- function(n = 1000, pattern = c("uniform", "under", "over", "bi
   }
 }
 
-# --------------------------------------------------------------------------- #
-# 3. Function to build one row of 3 plots
-# --------------------------------------------------------------------------- #
+# --- Function to build one row of 3 plots ---
 make_row <- function(scen) {
   # --- Prior & Posterior ---
   theta_vals <- seq(-10, 10, length.out = 400)
@@ -115,9 +108,7 @@ make_row <- function(scen) {
   p_prior | p_hist | p_ecdf
 }
 
-# --------------------------------------------------------------------------- #
-# 4. Combine all four rows into a 4×3 figure
-# --------------------------------------------------------------------------- #
+# --- Combine all four rows into a 4×3 figure ---
 rows <- lapply(scenarios, make_row)
 final_plot <- wrap_plots(rows, ncol = 1)
 final_plot

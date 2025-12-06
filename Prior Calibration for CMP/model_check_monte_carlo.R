@@ -48,5 +48,6 @@ estimate_total_moments <- function(hyperparameters, N_samples = 10000) {
 }
 
 
-hyperparameters <- c(0.1, 0.01, 1, 1)
-print(estimate_total_moments(hyperparameters))
+# --- Check ---
+hyperparameters <- c(2, 1, 2, 1)
+estimate_total_moments(hyperparameters, N_samples = 10^6)

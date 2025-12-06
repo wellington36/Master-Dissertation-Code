@@ -2,13 +2,11 @@
 
 conditional_mean <- function(mu, nu) {
   #' Approximation for E[Y | mu, nu] for the CMP distribution.
-
   return(mu + (nu - 1) / (2 * nu))
 }
 
 conditional_variance <- function(mu, nu) {
   #' Approximation for Var[Y | mu, nu] for the CMP distribution.
-  
   return(mu / nu)
 }
 
@@ -32,6 +30,7 @@ estimate_total_moments <- function(hyperparameters, N_samples = 10000) {
   mu_samples <- rgamma(N_samples, shape = alpha_mu, rate = beta_mu)
   nu_samples <- rgamma(N_samples, shape = alpha_nu, rate = beta_nu)
   
+  
   # Calculate conditional moments for each sample
   M_samples <- conditional_mean(mu_samples, nu_samples)
   V_samples <- conditional_variance(mu_samples, nu_samples)
@@ -49,5 +48,5 @@ estimate_total_moments <- function(hyperparameters, N_samples = 10000) {
 }
 
 
-hyperparameters <- c(0.01, 0.1, 1, 1)
+hyperparameters <- c(0.1, 0.01, 1, 1)
 print(estimate_total_moments(hyperparameters))

@@ -1,77 +1,74 @@
 source("rcomp_benson.R")
 
-cmp_hyper_check <- function(N,
-                            alpha_mu, beta_mu,
-                            alpha_nu, beta_nu) {
-  
-  Y <- numeric(N)
+random_variables_cmp_mu_nu <- function(N, mu_alpha_prior, mu_beta_prior,
+                                       nu_alpha_prior, nu_beta_prior) {
+  out <- numeric(N)
   
   for (i in seq_len(N)) {
-    mu_i <- rgamma(1, shape = alpha_mu, rate = beta_mu)
-    nu_i <- rgamma(1, shape = alpha_nu, rate = beta_nu)
-    lambda_i <- mu_i^nu_i
-    Y[i] <- rcomp_benson(lambda = lambda_i, nu = nu_i, n = 1)
+    mu <- rgamma(1, shape = mu_alpha_prior, rate = mu_beta_prior)
+    nu <- rgamma(1, shape = nu_alpha_prior, rate = nu_beta_prior)
+    lambda <- mu^nu
+    
+    print(sprintf("CMP Mean %.16f, Dispersion %.4f", mu, nu))
+    out[i] <- rcomp_benson(1, lambda, nu)
   }
   
-  emp_mean <- mean(Y)
-  emp_var  <- var(Y)
-  
-  # ============================
-  # Layout: 1 row, 2 columns
-  # ============================
-  par(mfrow = c(1, 2))
-  
-  # ============================
-  # Empirical PDF
-  # ============================
-  pdf_tab <- table(Y) / length(Y)
-  y_vals  <- as.numeric(names(pdf_tab))
-  pdf_vals <- as.numeric(pdf_tab)
-  
-  plot(y_vals, pdf_vals,
-       type = "h",
-       lwd = 3,
-       col = "darkred",
-       main = "Empirical PDF of Y",
-       xlab = "y",
-       ylab = "P(Y = y)")
-  points(y_vals, pdf_vals,
-         pch = 19,
-         col = "darkred")
-  grid()
-  
-  # ============================
-  # Empirical CDF
-  # ============================
-  plot(ecdf(Y),
-       main = "Empirical CDF of Y",
-       xlab = "y",
-       ylab = "F_Y(y)",
-       col = "blue",
-       lwd = 2)
-  grid()
-  
-  # Reset layout
-  par(mfrow = c(1, 1))
-  
-  # Print results
-  cat("\n----- Results -----\n")
-  cat("Empirical mean     =", emp_mean, "\n")
-  cat("Empirical variance =", emp_var, "\n")
-  cat("-------------------\n")
-  
-  invisible(list(
-    Y = Y,
-    pdf = pdf_tab,
-    cdf = ecdf(Y),
-    emp_mean = emp_mean,
-    emp_var = emp_var
-  ))
+  return(out)
 }
 
+# -------------------------------
+# Parameters
+# -------------------------------
+N <- 10000
 
-out <- cmp_hyper_check(
-  N = 5000,
-  alpha_mu = 0.01, beta_mu = 0.1,
-  alpha_nu = 1, beta_nu = 1
+mu_alpha_prior <- 0.1
+mu_beta_prior <- 0.01
+nu_alpha_prior <- 1
+nu_beta_prior <- 1
+
+data <- random_variables_cmp_mu_nu(N, mu_alpha_prior, mu_beta_prior,
+                                   nu_alpha_prior, nu_beta_prior)
+
+# -------------------------------
+# Empirical statistics
+# -------------------------------
+data_mean <- mean(data)
+data_var  <- var(data)
+
+cat("Empirical mean:", data_mean, "\n")
+cat("Empirical variance:", data_var, "\n")
+
+# -------------------------------
+# Plotting
+# -------------------------------
+par(mfrow = c(1, 3))
+
+# 1. Histogram
+hist(
+  data,
+  main = "Histogram of CMP Samples",
+  xlab = "Value",
+  col = "lightblue",
+  border = "white"
 )
+mtext(sprintf("Mean = %.2e, Var = %.2e", data_mean, data_var), side = 3, line = 0.3)
+
+# 2. ECDF
+plot(
+  ecdf(data),
+  main = "ECDF of CMP Samples",
+  xlab = "Value",
+  ylab = "F(x)"
+)
+mtext(sprintf("Mean = %.2e", data_mean), side = 3, line = 0.3)
+
+# 3. Scatter (index vs value)
+plot(
+  data,
+  pch = 19,
+  col = "blue",
+  main = "Scatter Plot of CMP Samples",
+  xlab = "Index",
+  ylab = "Value"
+)
+mtext(sprintf("Var = %.2e", data_var), side = 3, line = 0.3)

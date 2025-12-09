@@ -21,9 +21,9 @@ random_variables_cmp_mu_nu <- function(N, mu_alpha_prior, mu_beta_prior,
 # -------------------------------
 N <- 10000
 
-mu_alpha_prior <- 2
-mu_beta_prior <- 1
-nu_alpha_prior <- 2
+mu_alpha_prior <- 1
+mu_beta_prior <- 0.01
+nu_alpha_prior <- 1
 nu_beta_prior <- 1
 
 data <- random_variables_cmp_mu_nu(N, mu_alpha_prior, mu_beta_prior,

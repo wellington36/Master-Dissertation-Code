@@ -1,13 +1,25 @@
 # --- Conditional Moment Approximations ---
 
-conditional_mean <- function(mu, nu) {
+conditional_mean_default <- function(mu, nu) {
   #' Approximation for E[Y | mu, nu] for the CMP distribution.
-  return(mu + (nu - 1) / (2 * nu))
+  return(mu - (nu - 1) / (2 * nu))
 }
 
-conditional_variance <- function(mu, nu) {
+conditional_variance_default <- function(mu, nu) {
   #' Approximation for Var[Y | mu, nu] for the CMP distribution.
   return(mu / nu)
+}
+
+# Gaunt approximation
+conditional_mean_gaunt_2terms <- function(mu, nu) {
+  #' Approximation for E[Y | mu, nu] for the CMP distribution.
+  return(mu - (nu - 1) / (2 * nu) - (nu^2 - 1)/(24 * nu^2 * mu) -
+           ((nu^2 - 1)/(24 * nu^3 * mu^2)))
+}
+
+conditional_variance_gaunt_2terms <- function(mu, nu) {
+  #' Approximation for Var[Y | mu, nu] for the CMP distribution.
+  return((mu / nu) * (1 + (nu^2 -1)/(24*nu^2 * mu^2) + (nu^2 -1)/(12*nu^3 * mu^3)))
 }
 
 # --- Monte Carlo Moment Estimation ---
@@ -30,10 +42,9 @@ estimate_total_moments <- function(hyperparameters, N_samples = 10000) {
   mu_samples <- rgamma(N_samples, shape = alpha_mu, rate = beta_mu)
   nu_samples <- rgamma(N_samples, shape = alpha_nu, rate = beta_nu)
   
-  
   # Calculate conditional moments for each sample
-  M_samples <- conditional_mean(mu_samples, nu_samples)
-  V_samples <- conditional_variance(mu_samples, nu_samples)
+  M_samples <- conditional_mean_default(mu_samples, nu_samples)
+  V_samples <- conditional_variance_default(mu_samples, nu_samples)
   
   # Estimate Total Expectation: E[Y] = E[E[Y | mu, nu]]
   E_Y_hat <- mean(M_samples)
@@ -49,5 +60,5 @@ estimate_total_moments <- function(hyperparameters, N_samples = 10000) {
 
 
 # --- Check ---
-hyperparameters <- c(2, 1, 2, 1)
+hyperparameters <- c(0.1, 0.01, 1, 1)
 estimate_total_moments(hyperparameters, N_samples = 10^6)

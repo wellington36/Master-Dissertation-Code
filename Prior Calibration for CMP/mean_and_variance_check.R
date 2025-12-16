@@ -1,12 +1,12 @@
 source("rcomp_benson.R")
 
 # --- Conditional Moment Approximations ---
-conditional_mean_default <- function(mu, nu) {
+conditional_mean_shmueli <- function(mu, nu) {
   #' Approximation for E[Y | mu, nu] for the CMP distribution.
   return(mu - (nu - 1) / (2 * nu))
 }
 
-conditional_variance_default <- function(mu, nu) {
+conditional_variance_shmueli <- function(mu, nu) {
   #' Approximation for Var[Y | mu, nu] for the CMP distribution.
   return(mu / nu)
 }
@@ -122,9 +122,9 @@ run_simulation <- function(mu, nu, n_samples) {
   emp_mean <- mean(samples)
   emp_variance <- var(samples)
   
-  # Default
-  approx_mean_def <- conditional_mean_default(mu, nu)
-  approx_var_def <- conditional_variance_default(mu, nu)
+  # Shmueli
+  approx_mean_shmueli <- conditional_mean_shmueli(mu, nu)
+  approx_var_shmueli <- conditional_variance_shmueli(mu, nu)
   
   # Gaunt 1-term
   approx_mean_gaunt1t <- conditional_mean_gaunt_1term(mu, nu)
@@ -148,8 +148,8 @@ run_simulation <- function(mu, nu, n_samples) {
     Empirical_Variance = emp_variance,
     
     # Default Approximation
-    Approx_Mean_Default = approx_mean_def,
-    Approx_Var_Default = approx_var_def,
+    Approx_Mean_Shmueli = approx_mean_shmueli,
+    Approx_Var_Shmueli = approx_var_shmueli,
     
     # Gaunt-1term Approximation
     Approx_Mean_Gaunt_1term = approx_mean_gaunt1t,
@@ -183,21 +183,21 @@ final_results <- bind_rows(results_list)
 final_results <- final_results %>%
   mutate(
     # Mean Errors
-    Error_Mean_Default = Approx_Mean_Default - Empirical_Mean,
+    Error_Mean_Shmueli = Approx_Mean_Shmueli - Empirical_Mean,
     Error_Mean_Gaunt_1term = Approx_Mean_Gaunt_1term - Empirical_Mean,
     Error_Mean_Gaunt_2terms = Approx_Mean_Gaunt_2terms - Empirical_Mean,
     #Error_Mean_Threshold = Approx_Mean_Threshold - Empirical_Mean,
-    Rel_Error_Mean_Default = Error_Mean_Default / Empirical_Mean,
+    Rel_Error_Mean_Shmueli = Error_Mean_Shmueli / Empirical_Mean,
     Rel_Error_Mean_Gaunt_1term = Error_Mean_Gaunt_1term / Empirical_Mean,
     Rel_Error_Mean_Gaunt_2terms = Error_Mean_Gaunt_2terms / Empirical_Mean,
     #Rel_Error_Mean_Threshold = Error_Mean_Threshold / Empirical_Mean,
     
     # Variance Errors
-    Error_Var_Default = Approx_Var_Default - Empirical_Variance,
+    Error_Var_Shmueli = Approx_Var_Shmueli - Empirical_Variance,
     Error_Var_Gaunt_1term = Approx_Var_Gaunt_1term - Empirical_Variance,
     Error_Var_Gaunt_2terms = Approx_Var_Gaunt_2terms - Empirical_Variance,
     #Error_Var_Threshold = Approx_Var_Threshold - Empirical_Variance,
-    Rel_Error_Var_Default = Error_Var_Default / Empirical_Variance,
+    Rel_Error_Var_Shmueli = Error_Var_Shmueli / Empirical_Variance,
     Rel_Error_Var_Gaunt_1term = Error_Var_Gaunt_1term / Empirical_Variance,
     Rel_Error_Var_Gaunt_2terms = Error_Var_Gaunt_2terms / Empirical_Variance
     #Rel_Error_Var_Threshold = Error_Var_Threshold / Empirical_Variance
@@ -206,20 +206,16 @@ final_results <- final_results %>%
 # Print the final table of results and errors
 print(final_results)
 
-plot_data_all <- final_results %>%
-  select(mu, nu,
-         starts_with("Rel_Error_Mean"),
-         starts_with("Rel_Error_Var")) %>%
-  pivot_longer(
-    cols = starts_with("Rel_Error"),
-    names_to = "Quantity",
-    values_to = "Relative_Error"
-  ) %>%
+plot_data_all <- plot_data_all %>%
   mutate(
-    Metric = ifelse(grepl("Mean", Quantity), "Mean", "Variance"),
-    Approximation = Quantity %>%
-      gsub("Rel_Error_(Mean|Var)_", "", .)
-  
+    Approximation = factor(
+      Approximation,
+      levels = c(
+        "Shmueli",
+        "Gaunt_1term",
+        "Gaunt_2terms"
+      )
+    )
   )
 
 ggplot(

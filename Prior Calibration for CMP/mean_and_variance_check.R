@@ -1,5 +1,10 @@
 source("rcomp_benson.R")
 
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+
 # --- Conditional Moment Approximations ---
 conditional_mean_shmueli <- function(mu, nu) {
   #' Approximation for E[Y | mu, nu] for the CMP distribution.
@@ -104,11 +109,11 @@ conditional_variance_threshold <- function(mu, nu) {
 
 # --- Simulation Parameters ---
 # Grid of (mu, nu) parameters to test
-mu_values <- c(0.5, 1, 5, 10)
+mu_values <- c(0.5, 1, 2)
 nu_values <- c(0.5, 1, 2, 5) # nu=1 is Poisson, nu<1 is under-dispersed, nu>1 is over-dispersed
 
 # Number of samples for each (mu, nu) combination
-N_SAMPLES <- 1000000
+N_SAMPLES <- 10^6
 
 # Data frame to store all results
 results_df <- expand.grid(mu = mu_values, nu = nu_values)
@@ -206,6 +211,21 @@ final_results <- final_results %>%
 # Print the final table of results and errors
 print(final_results)
 
+plot_data_all <- final_results %>%
+  select(mu, nu,
+         starts_with("Rel_Error_Mean"),
+         starts_with("Rel_Error_Var")) %>%
+  pivot_longer(
+    cols = starts_with("Rel_Error"),
+    names_to = "Quantity",
+    values_to = "Relative_Error"
+  ) %>%
+  mutate(
+    Metric = ifelse(grepl("Mean", Quantity), "Mean", "Variance"),
+    Approximation = Quantity %>%
+      gsub("Rel_Error_(Mean|Var)_", "", .)
+  )
+
 plot_data_all <- plot_data_all %>%
   mutate(
     Approximation = factor(
@@ -218,82 +238,48 @@ plot_data_all <- plot_data_all %>%
     )
   )
 
+library(ggh4x)
+
 ggplot(
   plot_data_all,
-  aes(x = factor(mu),
-      y = Relative_Error,
-      fill = Approximation)
+  aes(
+    x = factor(mu),
+    y = Relative_Error,
+    fill = Approximation
+  )
 ) +
-  geom_bar(stat = "identity", position = position_dodge(width = 0.8)) +
-  facet_grid(
+  geom_bar(
+    stat = "identity",
+    position = position_dodge(width = 0.8),
+    color = "black",
+    linewidth = 0.3
+  ) +
+  facet_grid2(
     rows = vars(Metric),
     cols = vars(nu),
-    labeller = label_both
+    strip = strip_nested(),
+    switch = "y",
+    labeller = labeller(nu = function(x) paste0("ν = ", x))
   ) +
   scale_fill_brewer() +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  geom_hline(yintercept = 0, linetype = "dashed") +
   labs(
-    title = "Relative Error of COM-Poisson Moment Approximations",
     x = expression(mu),
     y = "Relative Error ((Approx − Empirical) / Empirical)",
     fill = "Approximation"
   ) +
   theme_minimal() +
   theme(
-    panel.spacing = unit(1, "lines"),
-    strip.text = element_text(face = "bold")
+    strip.placement = "outside",
+    strip.text.y.left = element_text(
+      face = "bold",
+      size = 11,
+      angle = 0,
+      hjust = 0.5
+    ),
+    strip.background = element_rect(
+      fill = "grey90",
+      color = "black"
+    ),
+    panel.spacing = unit(1, "lines")
   )
-
-
-# Prepare data for plotting (Mean)
-plot_data_mean <- final_results %>%
-  select(mu, nu, starts_with("Rel_Error_Mean")) %>%
-  pivot_longer(
-    cols = starts_with("Rel_Error_Mean"),
-    names_to = "Approximation",
-    values_to = "Relative_Error"
-  ) %>%
-  mutate(
-    Approximation = gsub("Rel_Error_Mean_", "", Approximation)
-  )
-
-# Plot Relative Error for Mean
-plot_mean <- ggplot(plot_data_mean, aes(x = factor(mu), y = Relative_Error, fill = Approximation)) +
-  geom_bar(stat = "identity", position = position_dodge()) +
-  facet_wrap(~ factor(nu), labeller = label_both) +
-  labs(
-    title = "Relative Error of Mean Approximations for COM-Poisson",
-    x = expression(mu),
-    y = "Relative Error ((Approx - Empirical) / Empirical)",
-    fill = "Approximation Type"
-  ) +
-  theme_minimal() +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red")
-
-plot_mean
-
-plot_data_var <- final_results %>%
-  select(mu, nu, starts_with("Rel_Error_Var")) %>%
-  pivot_longer(
-    cols = starts_with("Rel_Error_Var"),
-    names_to = "Approximation",
-    values_to = "Relative_Error"
-  ) %>%
-  mutate(
-    Approximation = gsub("Rel_Error_Var_", "", Approximation)
-  )
-
-# Plot Relative Error for Variance
-plot_variance <- ggplot(plot_data_var, aes(x = factor(mu), y = Relative_Error, fill = Approximation)) +
-  geom_bar(stat = "identity", position = position_dodge()) +
-  facet_wrap(~ factor(nu), labeller = label_both) +
-  labs(
-    title = "Relative Error of Variance Approximations for COM-Poisson",
-    x = expression(mu),
-    y = "Relative Error ((Approx - Empirical) / Empirical)",
-    fill = "Approximation Type"
-  ) +
-  theme_minimal() +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "red")
-
-plot_variance

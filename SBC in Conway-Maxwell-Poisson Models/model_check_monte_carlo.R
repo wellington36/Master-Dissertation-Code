@@ -1,3 +1,6 @@
+# --- Auxiliar Functions ---
+#logSumExp <- function(x) log(sum(exp(x - max(x)))) + max(x)
+
 # --- Conditional Moment Approximations ---
 
 conditional_mean_default <- function(mu, nu) {

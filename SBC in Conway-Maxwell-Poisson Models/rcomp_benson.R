@@ -15,8 +15,7 @@ log_B <- function(mu, nu, p = 1) {
 }
 
 
-rcomp_benson <- function(n, lambda, nu) {
-  mu <- lambda^(1/nu)
+rcomp_benson <- function(n, mu, nu) {
   out <- numeric(n)
   
   if (nu >= 1) {

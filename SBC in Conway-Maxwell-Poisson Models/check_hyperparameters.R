@@ -7,10 +7,9 @@ random_variables_cmp_mu_nu <- function(N, mu_alpha_prior, mu_beta_prior,
   for (i in seq_len(N)) {
     mu <- rgamma(1, shape = mu_alpha_prior, rate = mu_beta_prior)
     nu <- rgamma(1, shape = nu_alpha_prior, rate = nu_beta_prior)
-    lambda <- mu^nu
-    
+
     print(sprintf("CMP Mean %.16f, Dispersion %.4f", mu, nu))
-    out[i] <- rcomp_benson(1, lambda, nu)
+    out[i] <- rcomp_benson(1, mu, nu)
   }
   
   return(out)
@@ -51,7 +50,7 @@ hist(
   col = "lightblue",
   border = "white"
 )
-mtext(sprintf("Mean = %.2e, Var = %.2e", data_mean, data_var), side = 3, line = 0.3)
+#mtext(sprintf("Mean = %.2e, Var = %.2e", data_mean, data_var), side = 3, line = 0.3)
 
 # 2. ECDF
 plot(
@@ -60,7 +59,7 @@ plot(
   xlab = "Value",
   ylab = "F(x)"
 )
-mtext(sprintf("Mean = %.2e", data_mean), side = 3, line = 0.3)
+#mtext(sprintf("Mean = %.2e", data_mean), side = 3, line = 0.3)
 
 # 3. Scatter (index vs value)
 plot(
@@ -71,4 +70,4 @@ plot(
   xlab = "Index",
   ylab = "Value"
 )
-mtext(sprintf("Var = %.2e", data_var), side = 3, line = 0.3)
+#mtext(sprintf("Var = %.2e", data_var), side = 3, line = 0.3)

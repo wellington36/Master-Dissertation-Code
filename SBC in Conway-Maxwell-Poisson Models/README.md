@@ -1,8 +1,11 @@
 ## Code for the SBC in Conway-Maxwell-Poisson Models chapter
 
 ### Replicate Figures
-Dependencies: `normal_normal_sbc.stan`.
-- Fig. 2: `sbc_diagnostic_figure.R`
-- Fig. 3: `sbc_normal_normal.R`
-- Fig. 4: `sbc_normal_normal_u_shape.R`
-- Fig. 5: `sbc_normal_normal_inverted_u_shape.R`
+Dependencies: `com_poisson_pmf.R` and `rcomp_benson.R`.
+- Fig. 6: `mean_and_variance_check.R`
+- Fig. 7: `marginal_joint_proposed_prior.R`
+
+### Other
+- `check_hyperparameters.R`: plot distribution of CMP given the hyperparameters for gamma prior distributions.
+- `rcomp.R`: generate data from CMP based in Flavio's proposed idea.
+- `model_check_monte_carlo.R`: run Monte Carlo method to evaluate the mean and variance with the total expectation and total variance law.

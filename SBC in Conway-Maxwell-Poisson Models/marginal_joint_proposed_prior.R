@@ -16,9 +16,7 @@ nu_samples <- rgamma(N, shape = nu_alpha_prior, rate = nu_beta_prior)
 # Create a data frame
 prior_data <- data.frame(mu = mu_samples, nu = nu_samples)
 
-# --- Plotting ---
-
-# 1. Joint Distribution Plot (Scatter Plot)
+# Joint Distribution Plot
 p_joint <- ggplot(prior_data, aes(x = mu, y = nu)) +
   geom_point(alpha = 0.3, size = 0.5, color = "blue") +
   labs(
@@ -27,12 +25,10 @@ p_joint <- ggplot(prior_data, aes(x = mu, y = nu)) +
     title = "Joint Distribution of Prior Parameters"
   ) +
   theme_minimal() +
-  # Limit the x-axis to a reasonable range for visualization
-  # The mean is 10, but the variance is 1000, so we'll cap it
   coord_cartesian(xlim = c(0, 100), ylim = c(0, 5)) +
   theme(plot.title = element_text(hjust = 0.5))
 
-# 2. Marginal Distribution for mu (Density Plot)
+# Marginal Distribution for mu
 p_mu_marginal <- ggplot(prior_data, aes(x = mu)) +
   geom_density(fill = "lightblue", alpha = 0.7) +
   labs(x = expression(mu), y = "Density") +
@@ -40,13 +36,12 @@ p_mu_marginal <- ggplot(prior_data, aes(x = mu)) +
   coord_cartesian(xlim = c(0, 100)) +
   theme(axis.title.y = element_blank(), axis.text.y = element_blank())
 
-# 3. Marginal Distribution for nu (Density Plot)
+# Marginal Distribution for nu
 p_nu_marginal <- ggplot(prior_data, aes(x = nu)) +
   geom_density(fill = "lightcoral", alpha = 0.7) +
   labs(x = expression(nu), y = "Density") +
   theme_minimal() +
   coord_cartesian(xlim = c(0, 5)) +
-  # Flip coordinates for the right margin
   coord_flip() +
   theme(axis.title.x = element_blank(), axis.text.x = element_blank())
 

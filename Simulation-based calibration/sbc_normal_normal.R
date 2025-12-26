@@ -5,7 +5,7 @@ library(ggplot2)
 library(dplyr)
 
 # --- SBC Parameters ---
-STAN_FILE <- "SBC/normal_normal_sbc.stan"
+STAN_FILE <- "normal_normal_sbc.stan"
 N_SIMS <- 1000       # Number of SBC runs (simulated datasets)
 N_OBS <- 10          # Number of observations per dataset
 L_SAMPLES <- 200     # Number of posterior samples (L) for rank calculation

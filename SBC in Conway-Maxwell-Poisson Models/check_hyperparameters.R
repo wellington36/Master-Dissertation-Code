@@ -15,9 +15,7 @@ random_variables_cmp_mu_nu <- function(N, mu_alpha_prior, mu_beta_prior,
   return(out)
 }
 
-# -------------------------------
 # Parameters
-# -------------------------------
 N <- 10000
 
 mu_alpha_prior <- 1
@@ -28,21 +26,17 @@ nu_beta_prior <- 1
 data <- random_variables_cmp_mu_nu(N, mu_alpha_prior, mu_beta_prior,
                                    nu_alpha_prior, nu_beta_prior)
 
-# -------------------------------
 # Empirical statistics
-# -------------------------------
 data_mean <- mean(data)
 data_var  <- var(data)
 
 cat("Empirical mean:", data_mean, "\n")
 cat("Empirical variance:", data_var, "\n")
 
-# -------------------------------
 # Plotting
-# -------------------------------
 par(mfrow = c(1, 3))
 
-# 1. Histogram
+# Histogram
 hist(
   data,
   main = "Histogram of CMP Samples",
@@ -52,7 +46,7 @@ hist(
 )
 #mtext(sprintf("Mean = %.2e, Var = %.2e", data_mean, data_var), side = 3, line = 0.3)
 
-# 2. ECDF
+# ECDF
 plot(
   ecdf(data),
   main = "ECDF of CMP Samples",
@@ -61,7 +55,7 @@ plot(
 )
 #mtext(sprintf("Mean = %.2e", data_mean), side = 3, line = 0.3)
 
-# 3. Scatter (index vs value)
+# Scatter (index vs value)
 plot(
   data,
   pch = 19,

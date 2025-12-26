@@ -5,3 +5,8 @@
 
 src/__pycache__
 src/utils/__pycache__
+
+SBC/sandbox.R
+
+SBC/simple_normal_model
+SBC/normal_normal_sbc

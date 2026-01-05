@@ -4,6 +4,7 @@
 Dependencies: `com_poisson_pmf.R` and `rcomp_benson.R`.
 - Fig. 6: `mean_and_variance_check.R`
 - Fig. 7: `marginal_joint_proposed_prior.R`
+- Table 2: `packagers_vs_our_method.R`
 
 ### Other
 - `check_hyperparameters.R`: plot distribution of CMP given the hyperparameters for gamma prior distributions.

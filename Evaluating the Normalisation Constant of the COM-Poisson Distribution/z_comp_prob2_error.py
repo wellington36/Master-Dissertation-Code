@@ -6,7 +6,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from src.ratio_bounding_mp import ratio_bounding_mp
 
-from mpmath import mp, mpf, log, exp, loggamma, fsum, pi
+from mpmath import mp, mpf, log, exp, loggamma, fsum, pi, factorial
 from rpy2.robjects.packages import importr
 from src.utils.utils import logdiffexp
 from tabulate import tabulate
@@ -91,6 +91,8 @@ def z_gaunt(log_lambda, nu):
 if __name__ == "__main__":
     mp.dps = 200
 
+    prob = 2
+
     mu = [mpf(4), mpf(4), mpf(4), mpf(4), mpf(4)]
     nu = [mpf('0.1'), mpf('0.3'), mpf('1'), mpf('3'), mpf('30')]
     lamb = [mu[i]**nu[i] for i in range(len(mu))]
@@ -105,19 +107,27 @@ if __name__ == "__main__":
     error_m4 = []
     for i in range(len(lamb)):
         gold_value = ratio_bounding_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), gold_error, initial_k=initial_k)[1]
-        bp_iter = ratio_bounding_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
+        bp_value = ratio_bounding_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
 
-        #error_m4.append([exp(logdiffexp(bp_iter, gold_value))])
-        error_m4.append([exp(bp_iter)])
+        prob2_gold_value = prob * loglamb[i] - nu[i] * log(factorial(prob)) - gold_value
+        prob2_bp_value = prob * loglamb[i] - nu[i] * log(factorial(prob)) - bp_value
+
+
+        error_m4.append([exp(logdiffexp(prob2_bp_value, prob2_gold_value))])
+        #error_m4.append([exp(prob2_bp_value)])
 
     
     error = 10**(-16)
     error_m16 = []
     for i in range(len(lamb)):
         gold_value = ratio_bounding_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), gold_error, initial_k=initial_k)[1]
-        bp_iter = ratio_bounding_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
+        bp_value = ratio_bounding_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), error, initial_k=initial_k)[1]
 
-        error_m16.append([exp(logdiffexp(bp_iter, gold_value))])
+        prob2_gold_value = prob * loglamb[i] - nu[i] * log(factorial(prob)) - gold_value
+        prob2_bp_value = prob * loglamb[i] - nu[i] * log(factorial(prob)) - bp_value
+
+        error_m16.append([exp(logdiffexp(prob2_bp_value, prob2_gold_value))])
+        #error_m16.append([exp(prob2_bp_value)])
     
     # Libraries
     comp_reg = importr('COMPoissonReg')
@@ -130,16 +140,22 @@ if __name__ == "__main__":
     libraries = []
     for i in range(len(lamb)):
         gold_value = ratio_bounding_mp(f, (loglamb[i], nu[i]), M[i], mpf(0), gold_error, initial_k=initial_k)[1]
+        prob2_gold_value = prob * loglamb[i] - nu[i] * log(factorial(prob)) - gold_value
 
-        dcmp_value = log(list(comp_reg.dcmp(0, float(lamb[i]), float(nu[i])))[0])
         z_dcom_value = z_dcom(float(lamb[i]), float(nu[i]))
-        z_dcomp_value = z_dcomp(float(lamb[i]), float(nu[i]))
+        z_dcomp_value = log(z_dcomp(float(lamb[i]), float(nu[i])))
         z_gaunt_value = z_gaunt(log(float(lamb[i])), float(nu[i]))
 
-        libraries.append([exp(logdiffexp(gold_value, -1*mpf(dcmp_value))),
-                          exp(logdiffexp(gold_value, z_dcom_value)),
-                          abs(gold_value - z_dcomp_value),
-                          exp(logdiffexp(gold_value, z_gaunt_value))])
+        prob2_dcmp = log(list(comp_reg.dcmp(prob, float(lamb[i]), float(nu[i])))[0])
+        prob2_dcom = prob * loglamb[i] - nu[i] * log(factorial(prob)) - z_dcom_value
+        prob2_dcomp = prob * loglamb[i] - nu[i] * log(factorial(prob)) - z_dcomp_value
+        prob2_gaunt = prob * loglamb[i] - nu[i] * log(factorial(prob)) - z_gaunt_value
+
+        libraries.append([exp(logdiffexp(prob2_gold_value, p)) for p in [prob2_dcmp,
+                                                                         prob2_dcom,
+                                                                         prob2_dcomp,
+                                                                         prob2_gaunt]])
+        #libraries.append([exp(prob2_dcmp), exp(prob2_dcom), exp(prob2_dcomp), exp(prob2_gaunt)])
 
     
     # Organize in a table

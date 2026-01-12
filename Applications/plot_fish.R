@@ -1,22 +1,21 @@
-library(COMPoissonReg)
 library(brms)
 
 source("rcomp.R")
 
-data(couple)
+zinb <- read.csv("https://paul-buerkner.github.io/data/fish.csv")
 
-tab <- table(couple$UPB)
+tab <- table(zinb$count)
 
 x_obs <- as.numeric(names(tab))
 y_obs <- as.numeric(tab)
 N     <- sum(y_obs)
 
 # ---- Estimated Parameters (Using brms 30k where 20k was warmup) ----
-mu_hat     <- 0.000228946
-nu_hat     <- 0.156496
+mu_hat     <- 0.0001666206
+nu_hat     <- 0.08255835
 lambda_hat <- mu_hat^nu_hat
 
-lambda_poi_hat <- 0.8259007
+lambda_poi_hat <- 1.190736
 
 # COM-Poisson
 sim_cmp <- rcomp(

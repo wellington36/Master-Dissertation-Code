@@ -2,46 +2,44 @@ library(COMPoissonReg)
 library(parallel)
 library(pbapply)
 library(brms)
+
+source("rcomp.R")
+
 data(couple)
 
-tab <- table(couple$UPB)
-intercept_gold <- -0.35
-
-# Check data
-plot(
-  as.numeric(names(tab)),
-  as.numeric(tab),
-  type = "b",
-  lwd = 2,
-  col = "steelblue",
-  xlab = "Unwanted Pursuit Behaviour (UPB)",
-  ylab = "Frequency"
-)
 
 # MCMC run with brms
-leps <- - 16 * log(2)
-N_simulations <- 1   # increase later
+leps <- - 8 * log(2)
+intercept_gold <- 0.000215565
+N_simulations <- 100   # increase later
 stan_chains <- 1
-stan_iter <- 10000     # reduce while testing
-stan_warmup <- 8000
+stan_iter <- 1000     # reduce while testing
+stan_warmup <- 800
+core_number <- 34      # 3 for my machine 34 for virtual
 
-check_convergency <- function(rhat_intercept, estimate_intercept, intercept_gold) {
-  if (rhat_intercept < 1.01 & 
-      (estimate_intercept > intercept_gold - 0.01 & 
-       estimate_intercept < intercept_gold + 0.01)) {
+
+check_convergency <- function(rhat_intercept, estimate_intercept, intercept_gold, 
+                                       rel_tol = 0.01, abs_tol = 0.01) {
+  # Calculate the absolute error
+  abs_error <- abs(estimate_intercept - intercept_gold)
+  
+  # Dynamic threshold: handles both large scales (relative) and near-zero (absolute)
+  threshold <- max(rel_tol * abs(intercept_gold), abs_tol)
+  
+  # Convergence criteria
+  if (rhat_intercept < 1.01 && abs_error < threshold) {
     return(1)
-  } else if (rhat_intercept < 1.05 & 
-             (estimate_intercept > intercept_gold - 0.005 & 
-              estimate_intercept < intercept_gold + 0.005)) {
+  } else if (rhat_intercept < 1.05 && abs_error < (threshold * 0.5)) {
+    # Slightly higher R-hat requires better accuracy
     return(1)
-  } else if (rhat_intercept < 1.20 & 
-             (estimate_intercept > intercept_gold - 0.0002 & 
-              estimate_intercept < intercept_gold + 0.0002)) {
+  } else if (rhat_intercept < 1.10 && abs_error < (threshold * 0.1)) {
+    # Even higher R-hat requires much better accuracy
     return(1)
   } else {
     return(0)
   }
 }
+
 
 one_test <- function(i) {
   t0 <- Sys.time()
@@ -89,8 +87,8 @@ base_fit <- brm(
   UPB ~ 1,
   data = couple[1:5, ],   # tiny dummy dataset
   chains = 0,           # just compile, no sampling
-  prior = prior(normal(0, 1), class = "Intercept") +
-    prior(lognormal(0, 1), class = "shape"),
+  prior = prior("gamma(0.1,0.01)", class = "Intercept", lb = 0) +
+    prior("gamma(1, 1)", class = "shape", lb = 0),
   stanvars = custom_stanvars,
   backend = "cmdstanr",
   family = "com_poisson"
@@ -103,7 +101,7 @@ results_list <- pblapply(1:N_simulations,
                              one_test(i)   # check for inconsistenses
                            }, silent = TRUE)
                          },
-                         cl = 3)
+                         cl = core_number)
 results <- do.call(rbind, lapply(results_list, as.data.frame))
 
 cat("\n=== Overall diagnostics ===\n")

@@ -1,5 +1,3 @@
-source("com_poisson_pmf.R")
-
 # Auxiliar functions
 log_B <- function(mu, nu, p = 1) {
   if (nu < 1) {

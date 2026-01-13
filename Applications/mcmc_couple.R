@@ -8,13 +8,13 @@ data(couple)
 
 
 # MCMC run with brms
-leps <- - 16 * log(2)
-intercept_gold <- 0.0002329578
-N_simulations <- 1   # increase later
+leps <- - 1 * log(2)
+intercept_gold <- 0.001490307
+N_simulations <- 100   # increase later
 stan_chains <- 1
-stan_iter <- 30000     # reduce while testing
-stan_warmup <- 20000
-core_number <- 3      # 3 for my machine 34 for virtual
+stan_iter <- 1000     # reduce while testing
+stan_warmup <- 800
+core_number <- 34      # 4 for my machine 34 for virtual
 
 
 check_convergency <- function(rhat_intercept, estimate_intercept, intercept_gold, 

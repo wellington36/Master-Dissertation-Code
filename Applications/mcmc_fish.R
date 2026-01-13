@@ -1,3 +1,4 @@
+library(pbapply)
 library(brms)
 
 source("rcomp.R")
@@ -52,7 +53,7 @@ one_test <- function(i) {
   
   # --- Extract draws ---
   draws <- as_draws_df(fit)
-  lambda_draws <- exp(draws$b_Intercept)
+  mu_draws <- draws$b_Intercept
   nu_draws <- draws$shape
   
   # --- Diagnostics with posterior package ---
@@ -64,7 +65,7 @@ one_test <- function(i) {
   elapsed_sec <- as.numeric(difftime(t1, t0, units = "secs"))
   
   list(
-    lambda_mean = log(mean(lambda_draws)),
+    mu_mean     = mean(mu_draws),
     nu_mean     = mean(nu_draws),
     rhat        = rhat_intercept,
     ess         = ess_bulk_intercept,

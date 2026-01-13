@@ -1,10 +1,10 @@
-library(COMPoissonReg)
 library(pbapply)
+library(MASS)
 library(brms)
 
 source("rcomp.R")
 
-data(couple)
+data(epil)
 
 
 # MCMC run with brms
@@ -12,13 +12,13 @@ leps <- - 16 * log(2)
 intercept_gold <- 0.0002329578
 N_simulations <- 1   # increase later
 stan_chains <- 1
-stan_iter <- 30000     # reduce while testing
-stan_warmup <- 20000
+stan_iter <- 3000     # reduce while testing
+stan_warmup <- 2000
 core_number <- 3      # 3 for my machine 34 for virtual
 
 
 check_convergency <- function(rhat_intercept, estimate_intercept, intercept_gold, 
-                                       rel_tol = 0.01, abs_tol = 0.01) {
+                              rel_tol = 0.01, abs_tol = 0.01) {
   # Calculate the absolute error
   abs_error <- abs(estimate_intercept - intercept_gold)
   
@@ -44,7 +44,7 @@ one_test <- function(i) {
   t0 <- Sys.time()
   
   fit <- update(base_fit,
-                newdata = couple, 
+                newdata = epil, 
                 chains = stan_chains,
                 iter = stan_iter,
                 warmup = stan_warmup,
@@ -83,8 +83,8 @@ scode_string <- sprintf("real leps_custom() { return %f; }", leps)
 custom_stanvars <- stanvar(scode = scode_string, block = "functions")
 
 base_fit <- brm(
-  UPB ~ 1,
-  data = couple[1:5, ],   # tiny dummy dataset
+  y ~ 1,
+  data = epil[1:5, ],   # tiny dummy dataset
   chains = 0,           # just compile, no sampling
   prior = prior("gamma(0.1,0.01)", class = "Intercept", lb = 0) +
     prior("gamma(1, 1)", class = "shape", lb = 0),

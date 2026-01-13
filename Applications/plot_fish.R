@@ -11,8 +11,8 @@ y_obs <- as.numeric(tab)
 N     <- sum(y_obs)
 
 # ---- Estimated Parameters (Using brms 30k where 20k was warmup) ----
-mu_hat     <- 0.0001666206
-nu_hat     <- 0.08255835
+mu_hat     <- 0.001483061
+nu_hat     <- 0.08170763
 lambda_hat <- mu_hat^nu_hat
 
 lambda_poi_hat <- 1.190736

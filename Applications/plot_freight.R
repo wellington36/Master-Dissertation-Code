@@ -1,22 +1,22 @@
-library(MASS)
+library(COMPoissonReg)
 library(brms)
 
 source("rcomp.R")
 
-data(epil)
+data(freight)
 
-tab <- table(epil$y)
+tab <- table(freight$broken)
 
 x_obs <- as.numeric(names(tab))
 y_obs <- as.numeric(tab)
 N     <- sum(y_obs)
 
 # ---- Estimated Parameters (Using brms 30k where 20k was warmup) ----
-mu_hat     <- 0.01167851
-nu_hat     <- 0.04054064
+mu_hat     <- 2.603646
+nu_hat     <- 0.7169874
 lambda_hat <- mu_hat^nu_hat
 
-lambda_poi_hat <- 2.111893
+lambda_poi_hat <- 2.651771
 
 # COM-Poisson
 sim_cmp <- rcomp(

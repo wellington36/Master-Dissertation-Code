@@ -11,11 +11,11 @@ y_obs <- as.numeric(tab)
 N     <- sum(y_obs)
 
 # ---- Estimated Parameters (Using brms 30k where 20k was warmup) ----
-mu_hat     <- 0.001483061
-nu_hat     <- 0.08170763
+mu_hat     <- 1.002455
+nu_hat     <- 1.086199
 lambda_hat <- mu_hat^nu_hat
 
-lambda_poi_hat <- 1.190736
+lambda_poi_hat <- 3.296581
 
 # COM-Poisson
 sim_cmp <- rcomp(
@@ -47,31 +47,31 @@ par(mfrow = c(1, 2), mar = c(4, 4, 2, 1))
 plot(
   x_obs,
   y_obs,
-  type = "b",
-  lwd  = 2,
-  col  = "steelblue",
+  type = "h",
+  lwd  = 3,
+  col  = "black",
   xlab = "Unwanted Pursuit Behaviour (UPB)",
   ylab = "Frequency",
   main = "Observed vs Fitted"
 )
 
-lines(x_obs, y_cmp, type = "b", lwd = 2, col = "firebrick")
-lines(x_obs, y_poi, type = "b", lwd = 2, col = "darkgreen")
+lines(x_obs, y_poi, type = "l", lwd = 3, col = "firebrick")
+lines(x_obs, y_cmp, type = "l", lwd = 3, col = "steelblue")
 
 legend(
   "topright",
   legend = c("Observed", "COM-Poisson", "Poisson"),
-  col    = c("steelblue", "firebrick", "darkgreen"),
-  lwd    = 2,
+  col    = c("black", "steelblue", "firebrick"),
+  lwd    = 3,
   bty    = "n"
 )
 
 # ---- Panel 2: Errors ----
 plot(
   x_obs,
-  err_cmp,
-  type = "b",
-  lwd  = 2,
+  err_poi,
+  type = "l",
+  lwd  = 3,
   col  = "firebrick",
   xlab = "UPB",
   ylab = "Error (Observed - Fitted)",
@@ -81,13 +81,13 @@ plot(
 
 abline(h = 0, lty = 2, col = "gray50")
 
-lines(x_obs, err_poi, type = "b", lwd = 2, col = "darkgreen")
+lines(x_obs, err_cmp, type = "l", lwd = 3, col = "steelblue")
 
 legend(
   "topright",
   legend = c("COM-Poisson Error", "Poisson Error"),
-  col    = c("firebrick", "darkgreen"),
-  lwd    = 2,
+  col    = c("steelblue", "firebrick"),
+  lwd    = 3,
   bty    = "n"
 )
 

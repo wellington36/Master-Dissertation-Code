@@ -1,10 +1,10 @@
-library(COMPoissonReg)
+library(AER)
 source("rcomp.R")
 
 # Data
-data(couple)
+data("DoctorVisits")
 
-tab <- table(couple$UPB)
+tab <- table(DoctorVisits$visits)
 
 x_obs <- as.numeric(names(tab))
 y_obs <- as.numeric(tab)
@@ -12,11 +12,11 @@ N     <- sum(y_obs)
 K     <- length(x_obs)
 
 # Estimated parameters (30k iterations 20k warmup eps = 2^-32)
-mu_hat     <- 1.354418
-nu_hat     <- 0.1886298
+mu_hat     <- exp(-0.2262131)
+nu_hat     <- 2.12541
 lambda_hat <- mu_hat^nu_hat
 
-lambda_poi_hat <- 2.262526
+lambda_poi_hat <- exp(-2.046047)
 
 # Monte Carlo settings
 B <- 10000   # number of simulated datasets

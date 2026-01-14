@@ -1,49 +1,27 @@
+library(AER)
 library(pbapply)
 library(brms)
 
 source("rcomp.R")
 
-zinb <- read.csv("https://paul-buerkner.github.io/data/fish.csv")
+data("DoctorVisits")
 
 
 # MCMC run with brms
 leps <- - 32 * log(2)
-intercept_gold <- 0.00249054
 N_simulations <- 1   # increase later
 stan_chains <- 1
 stan_iter <- 30000     # reduce while testing
 stan_warmup <- 20000
-core_number <- 3      # 3 for my machine 34 for virtual
+core_number <- 4      # 4 for my machine 34 for virtual
 
-
-check_convergency <- function(rhat_intercept, estimate_intercept, intercept_gold, 
-                              rel_tol = 0.01, abs_tol = 0.01) {
-  # Calculate the absolute error
-  abs_error <- abs(estimate_intercept - intercept_gold)
-  
-  # Dynamic threshold: handles both large scales (relative) and near-zero (absolute)
-  threshold <- max(rel_tol * abs(intercept_gold), abs_tol)
-  
-  # Convergence criteria
-  if (rhat_intercept < 1.01 && abs_error < threshold) {
-    return(1)
-  } else if (rhat_intercept < 1.05 && abs_error < (threshold * 0.5)) {
-    # Slightly higher R-hat requires better accuracy
-    return(1)
-  } else if (rhat_intercept < 1.10 && abs_error < (threshold * 0.1)) {
-    # Even higher R-hat requires much better accuracy
-    return(1)
-  } else {
-    return(0)
-  }
-}
 
 
 one_test <- function(i) {
   t0 <- Sys.time()
   
   fit <- update(base_fit,
-                newdata = zinb, 
+                newdata = DoctorVisits, 
                 chains = stan_chains,
                 iter = stan_iter,
                 warmup = stan_warmup,
@@ -70,10 +48,7 @@ one_test <- function(i) {
     rhat        = rhat_intercept,
     ess         = ess_bulk_intercept,
     time_sec    = elapsed_sec,
-    ess_per_sec = ess_bulk_intercept / elapsed_sec,
-    converged   = check_convergency(rhat_intercept, 
-                                    estimate_intercept, 
-                                    intercept_gold)
+    ess_per_sec = ess_bulk_intercept / elapsed_sec
   )
 }
 
@@ -82,8 +57,8 @@ scode_string <- sprintf("real leps_custom() { return %f; }", leps)
 custom_stanvars <- stanvar(scode = scode_string, block = "functions")
 
 base_fit <- brm(
-  count ~ 1,
-  data = zinb[1:5, ],   # tiny dummy dataset
+  visits ~ age + income + illness,
+  data = DoctorVisits[1:5, ],   # tiny dummy dataset
   chains = 0,           # just compile, no sampling
   #prior = prior("gamma(0.1,0.01)", class = "Intercept", lb = 0) +
   #  prior("gamma(1, 1)", class = "shape", lb = 0),
@@ -107,5 +82,3 @@ cat("Mean ESS:", mean(results$ess), "\n")
 cat("Mean time (s):", mean(results$time_sec), "\n")
 cat("Mean ESS/sec:", mean(results$ess_per_sec), "\n")
 cat("MCMCs converged:", sum(results$converged), "of", N_simulations, "\n")
-
-

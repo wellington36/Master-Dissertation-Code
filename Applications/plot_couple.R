@@ -12,11 +12,11 @@ N     <- sum(y_obs)
 K     <- length(x_obs)
 
 # Estimated parameters (30k iterations 20k warmup eps = 2^-32)
-mu_hat     <- 1.354418
+mu_hat     <- 0.001178342
 nu_hat     <- 0.1886298
 lambda_hat <- mu_hat^nu_hat
 
-lambda_poi_hat <- 2.262526
+lambda_poi_hat <- exp(0.824999)
 
 # Monte Carlo settings
 B <- 10000   # number of simulated datasets

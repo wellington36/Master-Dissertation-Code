@@ -171,8 +171,11 @@ plot_sbc_diagnostics <- function(ranks, L_SAMPLES) {
     theme(plot.title = element_text(face = "bold"))
   
   # --- Combine Plots ---
-  final_plot <- (p_hist) / (p_ecdf + p_diff) + 
-    plot_annotation() & theme(plot.title = element_text(size = 16, face = "plain"))
+  final_plot <- 
+    p_hist / (p_ecdf + p_diff) +
+    plot_annotation(
+      theme = theme(plot.title = element_text(size = 16, face = "plain"))
+    )
 
   return(final_plot)
 }

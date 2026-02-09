@@ -25,3 +25,4 @@ Dependencies: `compoisson.stan`, `poisson.stan`, `nb.stan`, `rcomp.R` and `sbc_c
 ### Other
 - `sbc/sbc_plot.R`: plot rank histogram, ecdf and ecdf difference for one file.
 - `sbc/sandbox.R`: useful plots.
+

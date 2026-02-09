@@ -76,7 +76,7 @@ plot_ecdf_differences_for_N <- function(N_simulations,
   plots <- lapply(leps_vec, function(leps_exp) {
     
     file_name <- sprintf(
-      "sbc_N%i_leps%.0f.csv",
+      "results/sbc_N%i_leps%.0f.csv",
       N_simulations,
       leps_exp
     )

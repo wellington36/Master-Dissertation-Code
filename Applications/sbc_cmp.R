@@ -109,5 +109,5 @@ results_list <- pblapply(1:N_simulations,
 results <- do.call(rbind, results_list)
 
 # save
-file_name = sprintf("sbc_N%i_leps%.0f.csv", N_simulations, leps_exp)
+file_name = sprintf("results/sbc_N%i_leps%.0f.csv", N_simulations, leps_exp)
 write.csv(results, file_name, row.names = FALSE)

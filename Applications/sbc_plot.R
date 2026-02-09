@@ -7,7 +7,7 @@ library(patchwork)
 leps_exp      <- -53
 N_simulations <- 1000
 
-file_name = sprintf("sbc_N%i_leps%.0f.csv", N_simulations, leps_exp)
+file_name = sprintf("results/sbc_N%i_leps%.0f.csv", N_simulations, leps_exp)
 
 sbc_data <- read.csv(file_name)
 

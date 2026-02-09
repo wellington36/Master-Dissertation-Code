@@ -8,7 +8,7 @@ leps_vec <- c(-53, -32, -16, -8, -4, -2)
 ess_summary <- lapply(leps_vec, function(leps_exp) {
   
   file_name <- sprintf(
-    "sbc_N%i_leps%.0f.csv",
+    "results/sbc_N%i_leps%.0f.csv",
     N_simulations,
     leps_exp
   )

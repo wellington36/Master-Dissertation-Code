@@ -2,8 +2,10 @@
 
 ### Replicate Figures
 Dependencies: `com_poisson_pmf.R` and `rcomp_benson.R`.
-- Fig. 6: `mean_and_variance_check.R`
-- Fig. 7: `marginal_joint_proposed_prior.R`
+- Fig. 6: `packagers_vs_our_method.R`
+- Fig. 7: `packagers_vs_our_method.R`
+- Fig. 8: `mean_and_variance_check.R`
+- Fig. 9: `marginal_joint_proposed_prior.R`
 - Table 2: `packagers_vs_our_method.R`
 
 ### Other

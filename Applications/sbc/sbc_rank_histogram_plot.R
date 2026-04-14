@@ -52,21 +52,29 @@ plot_rank_histograms_for_N <- function(N_simulations,
                                        leps_vec = c(-53, -32, -16, -8, -4, -2),
                                        L_SAMPLES = 200) {
   
-  plots <- lapply(leps_vec, function(leps_exp) {
-    
+  all_data <- lapply(leps_vec, function(leps_exp) {
     file_name <- sprintf(
       "results/sbc_N%i_leps%.0f.csv",
       N_simulations,
       leps_exp
     )
-    
-    sbc_data <- read.csv(file_name)
+    read.csv(file_name)
+  })
+  
+  # Compute global max count across all histograms
+  max_count <- max(sapply(all_data, function(df) {
+    hist(df$rank_mu, breaks = 20, plot = FALSE)$counts
+  }))
+  
+  plots <- mapply(function(sbc_data, leps_exp) {
     
     plot_rank_histogram(
       ranks = sbc_data$rank_mu,
       leps_exp = leps_exp
-    )
-  })
+    ) +
+      ylim(0, max_count * 1.10)  # same y-axis for all
+    
+  }, all_data, leps_vec, SIMPLIFY = FALSE)
   
   wrap_plots(plots, ncol = 2) +
     plot_annotation()
